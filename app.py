@@ -7,7 +7,7 @@ import os
 from typing import Annotated, Optional
 
 from fastapi import FastAPI, Form, Request, HTTPException, status
-from fastapi.responses import HTMLResponse, PlainTextResponse
+from fastapi.responses import HTMLResponse, PlainTextResponse, XMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from fastapi.middleware.cors import CORSMiddleware
@@ -36,7 +36,7 @@ fapp = FastAPI(
     version="1.0.0"
 )
 
-fapp.mount("/static", StaticFiles(directory="static"), name="static")
+fapp.mount("/static", StaticFiles(directory="static", html=True), name="static")
 
 templates = Jinja2Templates(directory="templates")
 
@@ -175,6 +175,26 @@ async def healthz():
 @fapp.get("/ads.txt", response_class=PlainTextResponse)
 def static_from_root_google():
     return "google.com, pub-9035466269332608, DIRECT, f08c47fec0942fa0"
+
+
+@fapp.get("/robots.txt", response_class=PlainTextResponse)
+async def get_robots_txt():
+    return """User-agent: *
+Allow: /
+Sitemap: https://yt-playlist-length.enhar.net/sitemap.xml"""
+
+
+@fapp.get("/sitemap.xml", response_class=XMLResponse)
+async def get_sitemap():
+    return """<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+    <url>
+        <loc>https://yt-playlist-length.enhar.net/</loc>
+        <lastmod>2025-02-08</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>1.0</priority>
+    </url>
+</urlset>"""
 
 
 if __name__ == "__main__":
