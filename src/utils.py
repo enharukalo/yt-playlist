@@ -1,6 +1,5 @@
 import datetime
 import json
-import os
 from urllib.parse import urlencode
 
 import aiohttp
@@ -53,15 +52,28 @@ def parse(a):
     ts, td = a.seconds, a.days
     th, tr = divmod(ts, 3600)
     tm, ts = divmod(tr, 60)
+    
+    # Human readable format
     ds = ""
     if td:
-        ds += " {} day{},".format(td, "s" if td != 1 else "")
+        ds += "{} day{}, ".format(td, "s" if td != 1 else "")
     if th:
-        ds += " {} hour{},".format(th, "s" if th != 1 else "")
+        ds += "{} hour{}, ".format(th, "s" if th != 1 else "")
     if tm:
-        ds += " {} minute{},".format(tm, "s" if tm != 1 else "")
+        ds += "{} minute{}, ".format(tm, "s" if tm != 1 else "")
     if ts:
-        ds += " {} second{}".format(ts, "s" if ts != 1 else "")
+        ds += "{} second{}".format(ts, "s" if ts != 1 else "")
     if ds == "":
         ds = "0 seconds"
-    return ds.strip().strip(",")
+    
+    # Calculate total hours for determining if we need compact format
+    total_hours = td * 24 + th
+    
+    # Only add compact format if duration exceeds 24 hours
+    if total_hours >= 24:
+        # Calculate for compact format
+        total_minutes = tm
+        compact = f" ({total_hours}h {total_minutes}m)"
+        return f"{ds.strip().strip(',')}{compact}"
+    
+    return ds.strip().strip(',')

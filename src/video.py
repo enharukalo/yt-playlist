@@ -1,5 +1,3 @@
-from datetime import timedelta
-
 import isodate
 
 from src.utils import parse
@@ -32,9 +30,9 @@ class Video:
         self.duration = isodate.parse_duration(
             video_data["contentDetails"].get("duration", "PT0S")
         )
-        self.views = video_data["statistics"].get("viewCount", 0)
-        self.likes = video_data["statistics"].get("likeCount", 0)
-        self.comments = video_data["statistics"].get("commentCount", 0)
+        self.views = int(video_data["statistics"].get("viewCount", 0))
+        self.likes = int(video_data["statistics"].get("likeCount", 0))
+        self.comments = int(video_data["statistics"].get("commentCount", 0))
         self.considered = True if self.duration.total_seconds() > 0 else False
 
     def to_dict(self) -> dict:

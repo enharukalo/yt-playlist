@@ -6,163 +6,759 @@
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
     <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport" />
-    <meta name="viewport" content="width=device-width" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description"
-        content="Get the total length/duration of a YouTube playlist by passing its link as input. You get the time required to watch that playlist at different speeds.">
-
+        content="Free YouTube playlist duration calculator. Calculate exact watch times for any YouTube playlist at different playback speeds. Perfect for students, educators, and content creators planning their viewing schedule." />
+    <meta name="theme-color" content="#100F0F" />
 
     <!-- Favicon and title -->
-    <link rel="icon" href="{{url_for('static', path='/favicon.png')}}" />
-    <title>YouTube Playlist Length</title>
+    <link rel="icon" href="{{url_for('static', path='/favicon.ico')}}" />
+    <title>YouTube Playlist Length Calculator</title>
 
-    <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-6W24HY1SKP"></script>
-    <script>
-        window.dataLayer = window.dataLayer || [];
-        function gtag() { dataLayer.push(arguments); }
-        gtag('js', new Date());
+    <!-- Simplified external resources -->
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/js/all.min.js"></script>
+    <script defer src="{{url_for('static', path='/form_validation.js')}}"></script>
+    <link href="https://api.fontshare.com/v2/css?f[]=outfit@400,500,600,700&display=swap" rel="stylesheet">
 
-        gtag('config', 'G-6W24HY1SKP');
+    <!-- Open Graph / Social Media -->
+    <meta property="og:title" content="YouTube Playlist Length Calculator" />
+    <meta property="og:description" content="Calculate YouTube playlist durations instantly. Plan your watching schedule with precise time estimates at different playback speeds." />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://yt-playlist-length.enhar.net" />
+    
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="YouTube Playlist Length Calculator" />
+    <meta name="twitter:description" content="Calculate YouTube playlist durations instantly. Plan your watching schedule with precise time estimates." />
+    
+    <!-- Additional SEO -->
+    <meta name="keywords" content="youtube playlist length calculator, youtube playlist duration, video time calculator, youtube watch time estimator, playlist speed calculator, youtube time management, youtube study planner, youtube binge watch calculator" />
+    <meta name="author" content="Enhar Ukalo" />
+    <link rel="canonical" href="https://yt-playlist-length.enhar.net" />
+
+    <!-- Add preconnect for external resources -->
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com" />
+    <link rel="preconnect" href="https://api.fontshare.com" />
+
+    <!-- Add preload for critical resources -->
+    <link rel="preload" href="https://api.fontshare.com/v2/css?f[]=outfit@400,500,600,700&display=swap" as="style" />
+    <link rel="preload" href="{{url_for('static', path='/favicon.ico')}}" as="image" />
+
+    <!-- Add social media image meta tags -->
+    <meta property="og:image" content="https://yt-playlist-length.enhar.net/static/og-image.png" />
+    <meta property="twitter:image" content="https://yt-playlist-length.enhar.net/static/og-image.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+
+    <!-- Add language tag -->
+    <meta property="og:locale" content="en_US" />
+
+    <!-- Add structured data for better SEO -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "YouTube Playlist Length Calculator",
+      "description": "Calculate YouTube playlist durations instantly at different playback speeds",
+      "url": "https://yt-playlist-length.enhar.net",
+      "applicationCategory": "UtilityApplication",
+      "operatingSystem": "Any",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "author": {
+        "@type": "Person",
+        "name": "Enhar Ukalo"
+      }
+    }
     </script>
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8874895270666721"
-        crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/js/all.min.js"
-        crossorigin="anonymous"></script>
-    <!-- Halfmoon CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/halfmoon@1.1.1/css/halfmoon-variables.min.css" rel="stylesheet" />
 
+    <style>
+        :root {
+            --highlight: #FACB14;
+            --bg: #100F0F;
+            --text: #FFFFFF;
+            --text-secondary: #D0D4DA;
+            --border: rgba(255, 255, 255, 0.1);
+        }
 
-    <script src="{{url_for('static', path='/form_validation.js')}}"></script>
+        /* Prevent layout shift from scrollbar */
+        html {
+            scrollbar-gutter: stable;
+            overflow-y: scroll;
+        }
+
+        /* Reset and base styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Outfit', system-ui, -apple-system, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            min-height: 100vh;
+            overflow-x: hidden; /* Prevent horizontal scrollbar */
+        }
+
+        .container {
+            max-width: 768px;
+            margin: 0 auto;
+            padding: 0 1.5rem;
+        }
+
+        /* Header styles */
+        .navbar {
+            background: var(--bg);
+            border-bottom: 1px solid var(--border);
+            padding: 1rem 0;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+        }
+
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .brand {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--highlight);
+            text-decoration: none;
+        }
+
+        /* Main content styles */
+        .main-content {
+            padding: 6rem 1rem 2rem;
+        }
+
+        .title {
+            font-size: 2.25rem;
+            font-weight: 700;
+            color: var(--highlight);
+            margin-bottom: 1rem;
+        }
+
+        .form {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border);
+            border-radius: 1rem;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .description {
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+        }
+
+        .input {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border);
+            color: var(--text);
+            padding: 1rem;
+            border-radius: 0.5rem;
+            font-family: inherit;
+            transition: all 0.2s ease;
+            font-size: 0.95rem;
+        }
+
+        .input:focus {
+            outline: none;
+            border-color: var(--highlight);
+            box-shadow: 0 0 0 2px rgba(250, 203, 20, 0.2);
+        }
+
+        .input:hover {
+            background: rgba(255, 255, 255, 0.07);
+        }
+
+        .input-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        @media (min-width: 768px) {
+            .input-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 640px) {
+            .input-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .btn {
+                width: 100%;
+                margin-bottom: 0.5rem;
+            }
+            
+            .button-group {
+                flex-direction: column;
+            }
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            min-width: 120px;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid var(--border);
+        }
+
+        .btn-primary {
+            background: var(--highlight);
+            color: var(--bg);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--text);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.05);
+            transform: translateY(-2px);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(250, 203, 20, 0.2);
+        }
+
+        .btn[disabled] {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Results section */
+        .result-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            transition: all 0.3s ease;
+            opacity: 0;
+            transform: translateY(10px);
+            animation: fadeInUp 0.3s ease forwards;
+        }
+
+        .result-card:hover {
+            transform: translateY(-2px);
+            background: rgba(255, 255, 255, 0.04);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            border-color: var(--highlight);
+        }
+
+        .result-title {
+            color: var(--highlight);
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .result-text {
+            color: var(--text-secondary);
+            margin: 0.25rem 0;
+            line-height: 1.6;
+            padding: 0.25rem 0;
+        }
+
+        /* Add styles for different sections */
+        .result-text:empty {
+            height: 1rem;  /* Consistent spacing for blank lines */
+        }
+
+        .result-text[data-section="statistics"],
+        .result-text[data-section="watch-time"] {
+            background: rgba(255, 255, 255, 0.02);
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            margin: 0.5rem 0;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 640px) {
+            .main-content {
+                padding-top: 5rem;
+            }
+
+            .form {
+                padding: 1.5rem;
+            }
+
+            .title {
+                font-size: 1.75rem;
+            }
+
+            .input {
+                font-size: 16px;
+            }
+
+            .container {
+                padding: 0 1rem;
+            }
+
+            textarea.input,
+            .url-text {
+                font-size: 0.8rem;
+            }
+        }
+
+        .github-link {
+            color: var(--text);
+            font-size: 1.5rem;
+            transition: color 0.2s ease;
+            display: flex;
+            align-items: center;
+        }
+
+        .github-link:hover {
+            color: var(--highlight);
+        }
+
+        .form.loading {
+            opacity: 0.8;
+            pointer-events: none;
+        }
+
+        .form.loading .input {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        /* Improve textarea appearance */
+        textarea.input {
+            resize: vertical;
+            min-height: 100px;
+            line-height: 1.5;
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+            font-size: 0.85rem;
+            letter-spacing: -0.01em;
+        }
+
+        input[type="number"]::-webkit-outer-spin-button,
+        input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        /* Add these new styles */
+        .btn::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.1);
+            transform: translate(-50%, -50%) scale(0);
+            border-radius: 50%;
+            transition: transform 0.3s ease;
+        }
+        
+        .btn:active::after {
+            transform: translate(-50%, -50%) scale(2);
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                color-scheme: dark;
+            }
+        }
+        
+        /* Add loading spinner styles */
+        .loading-spinner {
+            display: none;
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--bg);
+            border-top-color: transparent;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin-left: 8px;
+        }
+        
+        .btn[disabled] .loading-spinner {
+            display: inline-block;
+        }
+        
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Button group styles */
+        .button-group {
+            display: flex;
+            gap: 1rem;
+            margin-top: 0.5rem;
+        }
+
+        /* Add styles for URL text */
+        .url-text {
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+            font-size: 0.85rem;
+            line-height: 1.5;
+            word-break: break-all;
+            color: var(--text-secondary);
+        }
+
+        /* Customize scrollbar for textareas only */
+        textarea::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        textarea::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+        }
+
+        textarea::-webkit-scrollbar-thumb {
+            background: var(--highlight);
+            border-radius: 4px;
+        }
+
+        /* Hide scrollbar for the main page but keep functionality */
+        ::-webkit-scrollbar {
+            width: 0px;
+            background: transparent;
+        }
+
+        /* For Firefox */
+        * {
+            scrollbar-width: none;
+        }
+
+        textarea {
+            scrollbar-width: thin;
+            scrollbar-color: var(--highlight) rgba(255, 255, 255, 0.1);
+        }
+
+        /* Add error message styling */
+        .error-message {
+            background: rgba(255, 0, 0, 0.1);
+            border: 1px solid rgba(255, 0, 0, 0.2);
+            color: #ff4444;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin-bottom: 1rem;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            display: none;
+        }
+
+        .error-message:not(:empty) {
+            display: block;
+        }
+
+        .result-text strong {
+            color: var(--text);
+            font-weight: 600;
+        }
+
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Add these new styles */
+        .nav-links {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .code-icon {
+            color: var(--text);
+            font-size: 1.5rem;
+            transition: color 0.2s ease;
+            display: flex;
+            align-items: center;
+        }
+
+        .code-icon:hover {
+            color: var(--highlight);
+        }
+
+        .code-icon svg {
+            width: 1.5rem;
+            height: 1.5rem;
+        }
+    </style>
 </head>
 
-<body class="with-custom-webkit-scrollbars with-custom-css-scrollbars" data-dm-shortcut-enabled="true"
-    data-set-preferred-mode-onload="true">
-
-    <div class="page-wrapper with-navbar with-navbar-fixed-bottom">
-        <div class="sticky-alerts"></div>
-
-        <!-- Navbar start -->
-        <nav class="navbar h-100 bg-light-lm">
-            <div class="container-lg">
-                <a href="https://ytplaylist-len.sharats.dev/">
-                    <img src="{{url_for('static', path='/logo.png')}}" height="60" alt="YouTube Playlist Length" />
+<body>
+    <nav class="navbar">
+        <div class="container nav-container">
+            <a href="/" class="brand">YT Playlist Length Calculator</a>
+            <div class="nav-links">
+                <a href="https://enhar.net" class="code-icon" aria-label="enhar.net">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M8 5v14l11-7z"/>
+                    </svg>
                 </a>
-                <span class="navbar-text text-monospace">
-                    <span class="badge badge-danger text-dark-dm text-white-lm"> v3.0</span>
-                </span>
-                <button class="btn btn-lg btn-square ml-auto text-danger" type="button"
-                    onclick="halfmoon.toggleDarkMode()">
-                    <i class="fa fa-moon" aria-hidden="true"></i>
-                    <span class="sr-only">Toggle dark mode</span>
-                </button>
+                <a href="https://github.com/enharukalo/yt-playlist" class="github-link" aria-label="View source on GitHub">
+                    <i class="fab fa-github" aria-hidden="true"></i>
+                </a>
+            </div>
+        </div>
+    </nav>
 
-                <a href="https://github.com/sharatsachin/ytplaylist-len">
-                    <button class="btn btn-lg btn-square ml-5 text-danger">
-                        <i class="fab fa-github" aria-hidden="true"></i>
-                        <span class="sr-only">Toggle dark mode</span>
+    <main class="main-content">
+        <div class="container">
+            <h1 class="title">Calculate YouTube Playlist Duration</h1>
+            
+            <form 
+                id="calculatorForm"
+                method="post" 
+                onsubmit="handleSubmit(event)" 
+                autocomplete="off"
+                class="form">
+                <input type="hidden" name="_csrf" value="{{ csrf_token }}">
+                <div id="form-errors" class="error-message"></div>
+                <p class="description">
+                    Enter YouTube playlist links or video URLs to calculate total watch time. Perfect for planning your study sessions or binge-watching schedule!
+                </p>
+                
+                <textarea 
+                    class="input" 
+                    name="search_string" 
+                    rows="4" 
+                    placeholder="Paste YouTube playlist or video URLs here (one per line):&#10;&#10;https://www.youtube.com/playlist?list=PLxxxxxxxx&#10;https://youtu.be/watch?v=xxxxx"
+                    required
+                    autofocus
+                    aria-label="YouTube URLs"
+                    spellcheck="false"
+                    autocomplete="off"></textarea>
+
+                <p class="description">
+                    Customize your calculation:
+                    <br>• Set video range to analyze specific sections
+                    <br>• Enter custom playback speed for accurate time estimates
+                </p>
+
+                <div class="input-grid">
+                    <input type="number" 
+                        class="input" 
+                        placeholder="Start video (optional)" 
+                        name="range_start" 
+                        min="1" 
+                        max="500"
+                        aria-label="Start video number">
+                    <input type="number" 
+                        class="input" 
+                        placeholder="End video (optional)" 
+                        name="range_end" 
+                        min="1" 
+                        max="500"
+                        aria-label="End video number">
+                    <input type="number" 
+                        class="input" 
+                        placeholder="Playback speed (e.g., 1.5)" 
+                        name="custom_speed" 
+                        min="0.1" 
+                        max="10" 
+                        step="0.01"
+                        aria-label="Playback speed multiplier">
+                    <input type="text" 
+                        class="input" 
+                        placeholder="YouTube API key (optional)" 
+                        name="youtube_api"
+                        aria-label="YouTube API key"
+                        autocomplete="off">
+                </div>
+
+                <div class="button-group">
+                    <button type="submit" class="btn btn-primary">
+                        Calculate
+                        <span class="loading-spinner" aria-hidden="true"></span>
                     </button>
-                </a>
-            </div>
-        </nav>
-        <!-- Navbar end -->
-
-        <!-- Content wrapper start -->
-        <div class="content-wrapper mt-20">
-            <div class="container px-20 h-50"></div>
-            <div class="container">
-                <div class="content">
-                    <h2 class="content-title">Find the length of any YouTube playlist:</h2>
-                    <form method="POST" onsubmit="return validateForm()">
-                        <div class="form-text content mx-0 my-5">
-                            You can enter a playlist link, playlist ID or even a video link from the playlist!
-                            <br />
-                            You can also enter a single video link or list of playlist links.
-                        </div>
-                        <div class="input-group">
-                            <textarea autofocus="autofocus" class="form-control"
-                                placeholder="youtube.com/playlist?list=ID1&#10;youtube.com/playlist?list=ID2"
-                                name="search_string" rows="10" required></textarea>
-                        </div>
-                        <div class="form-text content mx-0 my-5">
-                            Optionally, enter a range of videos to analyze in the first link. Leave blank to analyze the
-                            entire playlist.
-                            <br />
-                            You can also enter a custom speed (like 2.25), and a YouTube API key to use your own.
-                        </div>
-                        <div class="input-group">
-                            <input type="number" class="form-control" placeholder="Range start (1)" name="range_start"
-                                min="1" max="500">
-                            <input type="number" class="form-control" placeholder="Range end (500)" name="range_end"
-                                min="1" max="500">
-                            <input type="number" class="form-control" placeholder="Custom speed (like 2.25)"
-                                name="custom_speed" min="0.1" max="10" step="0.01">
-                            <input type="text" class="form-control" placeholder="YouTube API key" name="youtube_api">
-                            <div class="input-group-append">
-                                <button class="btn btn-primary ml-5 text-dark-dm shadow-none"
-                                    type="submit">Analyze</button>
-                            </div>
-                        </div>
-                    </form>
+                    <button type="reset" class="btn btn-secondary" onclick="handleReset(event)">
+                        Reset
+                    </button>
                 </div>
-            </div>
+            </form>
 
-            <div class="container">
-                {% for block in playlist_detail %}
-                <div class="card">
-                    <div class="card-body">
-                        {% for x in block %}
-                        {% if loop.first %}
-                        <p class="first-line" style="font-weight: bold;">{{ x |
-                            safe
-                            }}</p>
-                        {% else %}
-                        <p class="description">{{ x | safe }}</p>
-                        {% endif %}
-                        {% endfor %}
-                    </div>
+            <!-- Results section -->
+            {% if playlist_detail %}
+            {% for block in playlist_detail %}
+            <div class="result-card">
+                {% for x in block %}
+                {% if loop.first %}
+                <div class="result-title">{{ x | safe }}</div>
+                {% else %}
+                <div class="result-text">
+                    {% if 'youtube.com' in x or 'youtu.be' in x %}
+                    <span class="url-text">{{ x | escape }}</span>
+                    {% else %}
+                    {{ x | safe }}
+                    {% endif %}
                 </div>
+                {% endif %}
                 {% endfor %}
             </div>
-
-            <div class="container">
-                <div class="content">
-                    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8874895270666721"
-                         crossorigin="anonymous"></script>
-                    <!-- Below form -->
-                    <ins class="adsbygoogle"
-                         style="display:block"
-                         data-ad-client="ca-pub-8874895270666721"
-                         data-ad-slot="4571294072"
-                         data-ad-format="auto"></ins>
-                    <script>
-                         (adsbygoogle = window.adsbygoogle || []).push({});
-                    </script>
-                    
-                </div>
-            </div>
-
-
+            {% endfor %}
+            {% endif %}
         </div>
-        <!-- Content wrapper end -->
+    </main>
 
-
-        <!-- Navbar fixed bottom start -->
-        <nav class="navbar navbar-fixed-bottom bg-light-lm">
-            <div class="footer-content mx-auto">
-                Made with ❤ by <a href="https://www.sharats.dev"> Sharat Sachin</a>.
-                Buy me a <a href="https://ko-fi.com/sharat">coffee.</a>
-            </div>
-        </nav>
-        <!-- Navbar fixed bottom end -->
-    </div>
-    <!-- Page wrapper end -->
-
-    <script src="https://cdn.jsdelivr.net/npm/halfmoon@1.1.1/js/halfmoon.min.js"></script>
     <script>
-        // dark mode toggler
-        function toggleDemo() {
-            halfmoon.toggleDarkMode();
+        async function handleSubmit(event) {
+            event.preventDefault(); // Prevent form submission
+            const form = event.target;
+            const btn = form.querySelector('button[type="submit"]');
+            
+            if (!validateForm(event)) {
+                return false;
+            }
+
+            // Update button state
+            btn.disabled = true;
+            btn.innerHTML = 'Calculating<span class="loading-spinner"></span>';
+            
+            // Add loading class to form
+            form.classList.add('loading');
+
+            try {
+                // Create FormData object
+                const formData = new FormData(form);
+                
+                // Send POST request
+                const response = await fetch('/', {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+                
+                // Clear existing results
+                const existingResults = document.querySelectorAll('.result-card');
+                existingResults.forEach(card => card.remove());
+
+                // Add new results
+                if (data.playlist_detail && data.playlist_detail.length > 0) {
+                    const resultsContainer = document.createElement('div');
+                    resultsContainer.className = 'results-container';
+
+                    data.playlist_detail.forEach(block => {
+                        const resultCard = document.createElement('div');
+                        resultCard.className = 'result-card';
+
+                        block.forEach((x, index) => {
+                            const div = document.createElement('div');
+                            if (index === 0) {
+                                div.className = 'result-title';
+                                div.innerHTML = x;
+                            } else {
+                                div.className = 'result-text';
+                                if (x.includes('youtube.com') || x.includes('youtu.be')) {
+                                    div.innerHTML = `<span class="url-text">${escapeHtml(x)}</span>`;
+                                } else {
+                                    div.innerHTML = x;
+                                }
+                            }
+                            resultCard.appendChild(div);
+                        });
+
+                        resultsContainer.appendChild(resultCard);
+                    });
+
+                    // Insert results after the form
+                    form.parentNode.insertBefore(resultsContainer, form.nextSibling);
+
+                    // Smooth scroll to results
+                    resultsContainer.scrollIntoView({ behavior: 'smooth' });
+                }
+
+            } catch (error) {
+                console.error('Error:', error);
+                showError('An error occurred while calculating. Please try again.');
+            } finally {
+                // Reset button and form state
+                btn.disabled = false;
+                btn.innerHTML = 'Calculate<span class="loading-spinner"></span>';
+                form.classList.remove('loading');
+            }
         }
+
+        function escapeHtml(unsafe) {
+            return unsafe
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+
+        function handleReset(event) {
+            event.preventDefault();
+            const form = event.target.closest('form');
+            
+            // Clear all inputs
+            form.reset();
+            
+            // Remove any existing results with animation
+            const results = document.querySelectorAll('.result-card');
+            results.forEach(card => {
+                card.style.animation = 'fadeOut 0.3s ease forwards';
+                setTimeout(() => card.remove(), 300);
+            });
+            
+            // Clear any error messages
+            clearErrors();
+            
+            // Focus on textarea
+            form.querySelector('textarea').focus();
+        }
+
+        // Add fadeOut animation
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes fadeOut {
+                from { opacity: 1; transform: translateY(0); }
+                to { opacity: 0; transform: translateY(10px); }
+            }
+        `;
+        document.head.appendChild(style);
     </script>
 </body>
 
