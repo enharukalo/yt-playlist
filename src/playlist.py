@@ -3,22 +3,10 @@ import logging
 import os
 from datetime import timedelta
 
-import redis
 import asyncio
 
-from pymongo import MongoClient
 from src.utils import call_youtube_api, parse
 from src.video import Video
-
-REDIS_URL = os.environ["REDIS_URL"]
-MONGO_URL = os.environ["MONGO_URL"]
-CACHE_TTL = 60 * 60 * 24  # 24 hours
-
-redis_client = redis.from_url(REDIS_URL)
-mongo_collection = MongoClient(os.environ["MONGO_URL"])["ytplaylistdb"][
-    "ytplaylistcounts"
-]
-
 
 class Playlist:
     def __init__(
@@ -38,13 +26,8 @@ class Playlist:
         self.youtube_api = youtube_api
 
     async def do_async_work(self):
-
-        found = self.get_video_list_from_cache(self.playlist_id)
-        logging.info(f"Playlist {self.playlist_id} in cache: {found}")
-        if not found:
-            await self.get_video_ids_list()
-            await self.get_videos_details()
-            self.save_to_cache()
+        await self.get_video_ids_list()
+        await self.get_videos_details()
 
         self.available_count = sum([x.considered for x in self.videos])
         self.unavailable_count = len(self.videos) - self.available_count
@@ -72,41 +55,7 @@ class Playlist:
     def __repr__(self):
         return f"Playlist(playlist_id={self.playlist_id}, video_count={self.video_count}, total_duration={self.total_duration}, average_duration={self.average_duration})"
 
-    def increment_playlist_count(self, playlist_id):
-        try:
-            mongo_collection.update_one(
-                {"playlist_id": playlist_id}, {"$inc": {"count": 1}}, upsert=True
-            )
-        except Exception as e:
-            logging.error(f"Error incrementing playlist count for {playlist_id}: {e}")
-
-    def get_video_list_from_cache(self, playlist_id):
-        key = f"playlist:{playlist_id}"
-        self.increment_playlist_count(playlist_id)
-
-        try:
-            cached_data = redis_client.get(key)
-            if cached_data:
-                self.videos = [
-                    Video(video_id=None, video_data=video_data)
-                    for video_data in json.loads(cached_data)
-                ]
-                return True
-        except Exception as e:
-            logging.error(f"Error retrieving cache for {playlist_id}: {e}")
-
-        return False
-
-    def save_to_cache(self):
-        try:
-            jsonified_videos = json.dumps([video.to_dict() for video in self.videos])
-            key = f"playlist:{self.playlist_id}"
-            redis_client.setex(key, CACHE_TTL, jsonified_videos)
-        except Exception as e:
-            logging.error(f"Error saving to cache for playlist {self.playlist_id}: {e}")
-
     async def get_video_ids_list(self):
-
         self.video_ids = []
         while True:
             results = await call_youtube_api(
@@ -123,7 +72,6 @@ class Playlist:
                 break
 
     async def get_videos_details(self):
-
         self.videos = []
         chunks = [self.video_ids[i : i + 50] for i in range(0, len(self.video_ids), 50)]
         tasks = [
