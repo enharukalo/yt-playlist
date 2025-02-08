@@ -43,7 +43,7 @@ templates = Jinja2Templates(directory="templates")
 # Add security middlewares
 fapp.add_middleware(
     CORSMiddleware,
-    allow_origins=["https://yt-playlist-length.enhar.net"],
+    allow_origins=["https://yt-playlist-length.enhar.net", "https://yt-playlist-428z.onrender.com"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -53,6 +53,7 @@ fapp.add_middleware(
     TrustedHostMiddleware, 
     allowed_hosts=[
         "yt-playlist-length.enhar.net",
+        "yt-playlist-428z.onrender.com",
         "localhost",
         "127.0.0.1",
         "0.0.0.0",
