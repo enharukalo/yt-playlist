@@ -7,7 +7,7 @@ import os
 from typing import Annotated, Optional
 
 from fastapi import FastAPI, Form, Request, HTTPException, status
-from fastapi.responses import HTMLResponse, PlainTextResponse, XMLResponse
+from fastapi.responses import HTMLResponse, PlainTextResponse, Response
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from fastapi.middleware.cors import CORSMiddleware
@@ -184,9 +184,9 @@ Allow: /
 Sitemap: https://yt-playlist-length.enhar.net/sitemap.xml"""
 
 
-@fapp.get("/sitemap.xml", response_class=XMLResponse)
+@fapp.get("/sitemap.xml")
 async def get_sitemap():
-    return """<?xml version="1.0" encoding="UTF-8"?>
+    content = """<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
         <loc>https://yt-playlist-length.enhar.net/</loc>
@@ -195,6 +195,10 @@ async def get_sitemap():
         <priority>1.0</priority>
     </url>
 </urlset>"""
+    return Response(
+        content=content,
+        media_type="application/xml"
+    )
 
 
 if __name__ == "__main__":
