@@ -3,3 +3,16 @@ venv/
 .env
 *.pyc
 *.code-workspace
+
+# Docker
+.docker/
+docker-compose.override.yml
+docker-compose.yml
+Dockerfile
+
+# Environment
+.env
+.env.*
+!.env.example
+
+yt-playlist-length.conf
