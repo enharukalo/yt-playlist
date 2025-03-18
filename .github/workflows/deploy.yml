@@ -26,6 +26,6 @@ jobs:
           ssh -o StrictHostKeyChecking=no -p $SERVER_PORT $SERVER_USER@$SERVER_IP << 'EOF'
             cd /opt/yt-playlist
             git pull origin master
-            docker-compose down
-            docker-compose up -d --build
+            docker compose down
+            docker compose up -d --build
           EOF
