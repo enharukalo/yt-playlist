@@ -186,11 +186,14 @@ Sitemap: https://yt-playlist-length.enhar.net/sitemap.xml"""
 
 @fapp.get("/sitemap.xml")
 async def get_sitemap():
-    content = """<?xml version="1.0" encoding="UTF-8"?>
+    # Get current date in YYYY-MM-DD format
+    current_date = datetime.date.today().isoformat() 
+    
+    content = f"""<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
         <loc>https://yt-playlist-length.enhar.net/</loc>
-        <lastmod>2025-02-08</lastmod>
+        <lastmod>{current_date}</lastmod>
         <changefreq>weekly</changefreq>
         <priority>1.0</priority>
     </url>
